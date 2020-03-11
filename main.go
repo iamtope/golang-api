@@ -28,13 +28,13 @@ var books[]Book
 
 // create our route handler function
 func getBooks(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json") // set the  header content-type to application/json 
 	json.NewEncoder(w).Encode(books)
 }
 
 // Get single book
 func getBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json") // set the  header content-type to application/json 
 	params := mux.Vars(r) // Get any params
 	// loop through the books
 	for _, item:= range books {
@@ -49,7 +49,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 
 // create new books
 func createBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json") // set the  header content-type to application/json 
 	 var book Book
 	 _ = json.NewDecoder(r.Body).Decode(&book)
 	 book.ID = strconv.Itoa(rand.Intn(10000000)) // Mock Id which is not safe as it could generate an id twice. 
@@ -61,6 +61,20 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 
 // update book
 func updateBook(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json") // set the  header content-type to application/json 
+	params := mux.Vars(r)
+	for index, item:= range books {
+		if item.ID == params["id"] {
+			books = append(books[:index], books[index+1:]...)
+			var book Book
+	 		_ = json.NewDecoder(r.Body).Decode(&book)
+			book.ID = params["id"]  // Mock Id which is not safe as it could generate an id twice. 
+			books = append(books, book)
+			json.NewEncoder(w).Encode(book)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(books) 
 	
 }
 
@@ -68,7 +82,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 func deleteBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for _, item:= range books {
+	for index, item:= range books {
 		if item.ID == params["id"] {
 			books = append(books[:index], books[index+1:]...)
 			break
